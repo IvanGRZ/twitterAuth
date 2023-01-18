@@ -6,10 +6,15 @@ import logger from 'morgan';
 import dotenv from 'dotenv'
 import { createServer } from 'http';
 import { Server } from "socket.io";
+import passport from "passport";
+import md5 from "md5";
+import { Strategy as LocalStrategy} from 'passport-local'
+import { Strategy as TwitterStrategy} from 'passport-twitter'
 
 import mongooseConnect from './src/services/models/connect.js';
 import router from './src/routes/index.js'
 import { getStoreConfig } from './src/services/session/config.js';
+import userModel from './src/services/models/index.js';
 
 dotenv.config();
 
@@ -41,6 +46,48 @@ app.use(session({
 app.set('view engine', 'ejs');
 app.set('views', './public/views');
 
+passport.use('twitter', new TwitterStrategy({
+    consumerKey:"DH98IJEVZjecdPig5BRdiEG5U",
+    consumerSecret: "g2CsuAfcOKRB8gx5JFg55GmwT6sbqBZjB6vtgUu0QgsuSfKNI0",
+    callbackURL: "http://localhost:3005/auth/twitter/callback"
+}, (accessToken, refreshToken, profile, done) => {
+    console.log(profile);
+    done(null, profile);
+}));
+
+passport.use('login', new LocalStrategy(async (username, password, done) => {
+    const userData = await userModel.findOne({username, password: md5(password)});
+    if(!userData){
+        return done(null, false);
+    }
+    done(null, userData);
+}));
+
+passport.use('signup', new LocalStrategy({
+    passReqToCallback: true
+}, async (req, username, password, done) => {
+    const userData = await userModel.findOne({username, password: md5(password)});
+    if(userData){
+        return done(null, false);
+    }
+    const stageUser = new userModel({
+        username,
+        password: md5(password),
+        fullName: req.body.fullName
+    });
+    const newUser = await stageUser.save();
+    done(null, newUser);
+}));
+
+passport.serializeUser((user, done) => {
+    done(null, user._id);
+});
+
+passport.deserializeUser(async (id, done) => {
+    const userData = await userModel.findById(id);
+    done(null, userData);
+});
+
 app.use(router);
 //app.use(express.static('./public'));
 //app.use(express.static('./public/messageCenter'));
@@ -71,5 +118,8 @@ io.on('connection', (socket) => {
         io.sockets.emit('UPDATEFAKEPRODUCT', fakeProducts)
     });
 })
+
+
+
 
 export default app;

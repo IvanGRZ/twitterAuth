@@ -52,6 +52,53 @@ router.post("/signin", async (req, res) => {
   }
 });
 
+router.post("/signUp", async (req, res) => {
+  try {
+    const { username, password, fullName } = req.body;
+    if (_.isNil(username) || _.isNil(password) || _.isNil(fullName)) {
+      return res.status(400).json({
+        success: false,
+        message: `${httpStatus[400]}: Username, password or name missing`,
+      });
+    }
+    const checkUser = await userService.getUserByCondition({ username });
+    if (checkUser) {
+      return res.status(409).json({
+        success: false,
+        message: `${httpStatus[409]}: User already exists`,
+      });
+    }
+    const newUser = await userService.createUser({
+      username,
+      password: md5(password),
+      fullName,
+    });
+    if (!newUser) {
+      return res.status(500).json({
+        success: false,
+        message: `${httpStatus[500]}`,
+      });
+    }
+
+    const userDataFormatted = new UserDTO(newUser).build();
+
+    const accessToken = jwtService.generateJwt(userDataFormatted);
+
+    res.status(200).json({
+      success: true,
+      expiresIn: 60 * 60,
+      accessToken,
+      data: userDataFormatted,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+        success: false,
+        message: `${httpStatus[500]}: Internal error`,
+    });
+  }
+});
+
 router.get('/test', authMiddleware, (req, res) => {
     res.status(200).json(req.user); 
 });
