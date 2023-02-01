@@ -15,4 +15,12 @@ router.get('/home', authMiddleware, (req, res) => {
     res.render('home');
 });
 
+router.get('/info', (req, res) => {
+    res.render('info');
+});
+
+router.get('/random', (req, res) => {
+    res.render('random');
+});
+
 export default router;

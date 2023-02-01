@@ -9,6 +9,8 @@ import messagesRoutes from './messages/index.js'
 
 import twitterRoutes from './twitterAuth/index.js'
 
+import infoRoutes from './info/index.js'
+import randomRoutes from './random/index.js'
 
 const router = express.Router();
 
@@ -18,6 +20,8 @@ router.use('/api/auth', authRoutes);
 
 router.use('/api', productsRoutes)
 router.use('/api', messagesRoutes);
+router.use('/api', infoRoutes)
+router.use('/api', randomRoutes)
 
 router.use('/api/auth/twitter',twitterRoutes)
 

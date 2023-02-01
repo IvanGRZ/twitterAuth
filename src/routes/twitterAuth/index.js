@@ -1,5 +1,6 @@
 import express from "express";
 import md5  from "md5";
+import passport from 'passport';
 
 const router = express.Router();
 
