@@ -17,13 +17,14 @@
         window.addEventListener('load', function() {
             function getData() {
 
-                const response = fetch('http://localhost:3005/api/random', {
+                const response = fetch('http://localhost:3005/api/random?cant=10', {
                 method: 'GET', 
                 mode: 'cors',
                 credentials: 'same-origin',
                 headers: {
                     'Content-Type': 'application/json'
                 },
+
                 });
                 return response
             }
@@ -31,17 +32,16 @@
             getData()
             .then(response => response.json())
             .then(data => {
-                
-            const info = 
-            `
-                <ul>
-                    <li>_pid: ${data.randoms._pid}</li>
-                </ul>
-            `;
-            
-            
-            document.getElementById('Info').innerHTML = info;
-            })
+
+            let repetidos = {}
+
+            data.forEach(function(numero){
+              repetidos[numero] = (repetidos[numero] || 0) + 1          
+            });
+
+            let listingJSON = JSON.stringify(repetidos);
+            document.getElementById("Info").innerHTML = listingJSON;
+          })
         });        
       </script>
 

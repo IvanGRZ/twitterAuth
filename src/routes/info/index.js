@@ -1,4 +1,5 @@
 import express from "express";
+import os from 'node:os';
 
 const router = express.Router();
 
@@ -8,7 +9,8 @@ router.get("/info", (req, res) => {
     return res.status(200).json(
       {
         args:  args,
-        process: process
+        process: process,
+        numberOfProcessors: os.cpus().length
       }
     );
   
