@@ -1,6 +1,6 @@
 Benchmark con console log
 
-╰─>$ node benchmark.js
+╰─> $ node benchmark.js
 Running tests
 Running 20s test @ http://localhost:3005/info
 100 connections
