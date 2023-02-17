@@ -1,5 +1,6 @@
 import knexConfig from '../config.js';
 import knex from 'knex'; 
+import logger4 from '../../../loggers/index.js';
 
 const kn = new knex(knexConfig);
 
@@ -12,9 +13,9 @@ class chatContainer {
       table.string("message");
       table.string("moment");
     }).then(() => {
-        console.info('Table created');
+        logger4.info('Table created');
     }).catch(err => {
-        console.error(err)
+        logger4.error(err)
     })
   }
 

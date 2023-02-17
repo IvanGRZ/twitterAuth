@@ -8,6 +8,7 @@ import userContainer from "../../services/database/userContainer/index.js";
 import UserDTO from '../../dto/user/index.js';
 import JwtService from '../../services/jwt/index.js';
 import authMiddleware from '../../middlewares/authMiddleware.js';
+import logger4 from "../../loggers/index.js";
 
 
 const router = express.Router();
@@ -44,7 +45,7 @@ router.post("/signin", async (req, res) => {
       accessToken,
     });
   } catch (err) {
-    console.error(err);
+    logger4.error(err);
     return res.status(500).json({
       success: false,
       message: `${httpStatus[500]}: Internal error`,
@@ -91,7 +92,7 @@ router.post("/signUp", async (req, res) => {
       data: userDataFormatted,
     });
   } catch (err) {
-    console.error(err);
+    logger4.error(err);
     return res.status(500).json({
         success: false,
         message: `${httpStatus[500]}: Internal error`,

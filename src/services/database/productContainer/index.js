@@ -1,5 +1,6 @@
 import knexConfig from '../config.js';
 import knex from 'knex'; 
+import loggerMiddleware from '../../../middlewares/loggerMiddleware.js';
 
 const kn = new knex(knexConfig);
 
@@ -18,9 +19,9 @@ class ProductContainer {
       table.float("price");
       table.string("thumbnail");
     }).then(() => {
-        console.info('Table created');
+        logger4.info('Table created');
     }).catch(err => {
-        console.error(err)
+        logger4.error(err)
     }).finally(() => {
         kn.destroy();
     });

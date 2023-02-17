@@ -4,6 +4,7 @@ import MongoStore from 'connect-mongo'
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import dotenv from 'dotenv'
+import compression from "compression";
 import { createServer } from 'http';
 import { Server } from "socket.io";
 import passport from "passport";
@@ -16,6 +17,8 @@ import router from './src/routes/index.js'
 import { getStoreConfig } from './src/services/session/config.js';
 import userModel from './src/services/models/index.js';
 
+import loggerMiddleware from "./src/middlewares/loggerMiddleware.js";
+
 dotenv.config();
 
 const app = express();
@@ -27,6 +30,8 @@ const io = new Server(http);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(logger('tiny'));
+app.use(loggerMiddleware);
+app.use(compression());
 
 mongooseConnect();
 
@@ -51,7 +56,7 @@ passport.use('twitter', new TwitterStrategy({
     consumerSecret: "g2CsuAfcOKRB8gx5JFg55GmwT6sbqBZjB6vtgUu0QgsuSfKNI0",
     callbackURL: "http://localhost:3005/auth/twitter/callback"
 }, (accessToken, refreshToken, profile, done) => {
-    console.log(profile);
+    //console.log(profile);
     done(null, profile);
 }));
 

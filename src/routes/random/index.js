@@ -1,6 +1,7 @@
 import express from "express";
 import { fork } from 'child_process';
 import os from 'node:os';
+import logger4 from "../../loggers/index.js";
 
 const router = express.Router();
 
@@ -17,11 +18,11 @@ router.get("/random", (req, res) => {
     });
     
     randomNumbersGeneratorFork.send(cant);
-    console.log('Lista generada')
+    logger4.log('Lista generada')
 
 
   } catch (err) {
-    console.error(err);
+    logger4.error(err);
     return res.status(500).json({
       success: false,
       message: `${httpStatus[500]}: Internal error`,

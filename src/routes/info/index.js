@@ -1,5 +1,6 @@
 import express from "express";
 import os from 'node:os';
+import logger4 from "../../loggers/index.js";
 
 const router = express.Router();
 
@@ -15,7 +16,7 @@ router.get("/info", (req, res) => {
     );
   
   } catch (err) {
-    console.error(err);
+    logger4.error(err);
     return res.status(500).json({
       success: false,
       message: `${httpStatus[500]}: Internal error`,
