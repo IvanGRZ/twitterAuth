@@ -29,7 +29,7 @@ Req/Bytes counts sampled once per second.
 ```
 
 Benchmark sin console log
-
+```
 ╰─> $ node benchmark.js
 Running 20s test @ http://localhost:3005/info
 100 connections
@@ -52,3 +52,5 @@ Req/Bytes counts sampled once per second.
 
 129k requests in 20.06s, 0 B read
 129k errors (0 timeouts)
+```
+
