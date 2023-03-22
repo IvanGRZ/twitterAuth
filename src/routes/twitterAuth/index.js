@@ -4,17 +4,17 @@ import passport from 'passport';
 
 const router = express.Router();
 
-router.post('/signup', passport.authenticate('signup', {failureRedirect: '/error'}), async (req, res) => {
+router.post('/auth/twitter/signup', passport.authenticate('signup', {failureRedirect: '/error'}), async (req, res) => {
     console.log(req.user);
     res.redirect('/home');
 });
 
-router.post('/signin', passport.authenticate('login', {failureRedirect: '/error'}), async (req, res) => {
+router.post('/auth/twitter/signin', passport.authenticate('login', {failureRedirect: '/error'}), async (req, res) => {
     console.log(req.user);
     res.redirect('/home');
 });
 
-router.get('/signout', (req, res) => {
+router.get('/auth/twitter/signout', (req, res) => {
     req.logout(() => {
         res.redirect('/signin');
     })

@@ -4,6 +4,7 @@ import MongoStore from 'connect-mongo'
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import dotenv from 'dotenv'
+import _ from "lodash";
 import compression from "compression";
 import { createServer } from 'http';
 import { Server } from "socket.io";
@@ -15,9 +16,10 @@ import { Strategy as TwitterStrategy} from 'passport-twitter'
 import mongooseConnect from './src/services/models/connect.js';
 import router from './src/routes/index.js'
 import { getStoreConfig } from './src/services/session/config.js';
-import userModel from './src/services/models/index.js';
-
 import loggerMiddleware from "./src/middlewares/loggerMiddleware.js";
+
+import { AuthDao } from "./src/daos/index.js";
+
 
 dotenv.config();
 
@@ -56,42 +58,61 @@ passport.use('twitter', new TwitterStrategy({
     consumerSecret: "g2CsuAfcOKRB8gx5JFg55GmwT6sbqBZjB6vtgUu0QgsuSfKNI0",
     callbackURL: "http://localhost:3005/auth/twitter/callback"
 }, (accessToken, refreshToken, profile, done) => {
-    //console.log(profile);
     done(null, profile);
 }));
 
-passport.use('login', new LocalStrategy(async (username, password, done) => {
-    const userData = await userModel.findOne({username, password: md5(password)});
-    if(!userData){
+
+passport.use('login' ,new LocalStrategy(async (username, password, done) => {
+    const user = await AuthDao.login(username, md5(password))
+
+    if(!user){
         return done(null, false);
     }
-    done(null, userData);
+    else{
+        return done(null, user)
+    }
 }));
 
-passport.use('signup', new LocalStrategy({
-    passReqToCallback: true
-}, async (req, username, password, done) => {
-    const userData = await userModel.findOne({username, password: md5(password)});
-    if(userData){
-        return done(null, false);
-    }
-    const stageUser = new userModel({
-        username,
-        password: md5(password),
-        fullName: req.body.fullName
-    });
-    const newUser = await stageUser.save();
-    done(null, newUser);
+passport.use('signup', new LocalStrategy({ passReqToCallback: true},
+    async (req, username, password, done) => {
+
+        if (_.isNil(username) || _.isNil(password) || _.isNil(req.body.name)) {
+            return res.status(400).json({
+              success: false,
+              message: `${httpStatus[400]}: Username, password or name missing`,
+            });
+        }
+
+        else {
+            const existUser = await AuthDao.signUp(
+                username, 
+                md5(password), 
+                req.body.address, 
+                req.body.age, 
+                req.body.picture,
+                req.body.name, 
+                req.body.phone,
+            );
+            if(typeof existUser == 'boolean'){
+                return done(null, false);
+            }
+            else{
+                return done(null, existUser);
+            }
+        }
 }));
+
+
 
 passport.serializeUser((user, done) => {
-    done(null, user._id);
+    done(null, user.id);
 });
 
 passport.deserializeUser(async (id, done) => {
-    const userData = await userModel.findById(id);
-    done(null, userData);
+    const user = await AuthDao.findById(id)
+    done(null, user);
 });
+
 
 app.use(router);
 //app.use(express.static('./public'));

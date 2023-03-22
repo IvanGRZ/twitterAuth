@@ -1,6 +1,6 @@
 class UserDTO{
     constructor(data){
-        this.username = data.username
+        this.username = data.Email
     }
 
     build(){

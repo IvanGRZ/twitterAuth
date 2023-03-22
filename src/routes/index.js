@@ -16,17 +16,11 @@ const router = express.Router();
 
 
 router.use(pagesRouter)
-router.use('/api/auth', authRoutes);
-
+router.use('/api', authRoutes);
+router.use('/api',twitterRoutes)
 router.use('/api', productsRoutes)
 router.use('/api', messagesRoutes);
 router.use('/api', infoRoutes)
 router.use('/api', randomRoutes)
-
-router.use('/api/auth/twitter',twitterRoutes)
-
-router.get('/auth/twitter', passport.authenticate('twitter'));
-
-router.get('/auth/twitter/callback', passport.authenticate('twitter', {successRedirect: '/', failureRedirect: '/signin'}));
 
 export default router;
