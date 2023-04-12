@@ -1,4 +1,14 @@
 import express from "express";
+import { graphqlHTTP } from 'express-graphql';
+import { buildSchema } from 'graphql';
+import {schema} from "./src/graphql/schema.js";
+import {
+    getAllProducts,
+    getProductByID,
+    deleteAllProducts,
+    deleteproductById,
+    saveProduct
+} from './src/graphql/functions.js'
 import session from "express-session";
 import MongoStore from 'connect-mongo'
 import cookieParser from 'cookie-parser';
@@ -113,10 +123,19 @@ passport.deserializeUser(async (id, done) => {
     done(null, user);
 });
 
-
 app.use(router);
-//app.use(express.static('./public'));
-//app.use(express.static('./public/messageCenter'));
+app.use('/graphql', graphqlHTTP({
+    schema: schema,
+    rootValue: {
+        getAllProducts,
+        getProductByID,
+        deleteAllProducts,
+        deleteproductById,
+        saveProduct
+    },
+    graphiql: false,
+ }));
+ 
 
 const products = []
 const messages = []
